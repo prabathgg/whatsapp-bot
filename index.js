@@ -20,6 +20,7 @@ app.get("/webhook", (req, res) => {
 // Incoming messages
 app.post("/webhook", async (req, res) => {
   res.sendStatus(200);
+  console.log("Webhook received:", JSON.stringify(req.body));
   try {
     const msg = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
     if (!msg || msg.type !== "text") return;
@@ -32,7 +33,7 @@ app.post("/webhook", async (req, res) => {
       reply = "මිල ගණන් ගැන දැනගන්න කරුණාකර අපට පණිවිඩයක් තබන්න.";
     }
 
-    await fetch(`https://graph.facebook.com/v25.0/${PHONE_ID}/messages`, {
+    const r = await fetch(`https://graph.facebook.com/v25.0/${PHONE_ID}/messages`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${WA_TOKEN}`,
@@ -44,6 +45,7 @@ app.post("/webhook", async (req, res) => {
         text: { body: reply },
       }),
     });
+    console.log("Send result:", r.status, await r.text());
   } catch (e) {
     console.error(e);
   }
